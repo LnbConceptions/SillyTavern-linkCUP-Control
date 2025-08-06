@@ -1,0 +1,83 @@
+# linkCUP SillyTavern Extension - Communication Protocol v2.0
+# Date: 2025-08-06
+# Based on the implementation in the linkcup SillyTavern extension.
+
+# --- Bluetooth Service & Characteristics ---
+
+- Service UUID: 6e400001-b5a3-f393-e0a9-e50e24dcca9e
+- Write Characteristic UUID: 6e400002-b5a3-f393-e0a9-e50e24dcca9e
+- Notify Characteristic UUID: 6e400003-b5a3-f393-e0a9-e50e24dcca9e
+
+# --- Message Type Definitions ---
+
+A summary of the message `type` values used in communication.
+
+- `1`: [BLE -> APP] UUID Information
+- `2`: [APP -> BLE] Acknowledgement (ACK)
+- `4`: [BLE -> APP] MAC Address Information
+- `5`: [BLE -> APP] Firmware Version Information
+- `7`: [BLE -> APP] Real-time Data Packet (Legacy format)
+- `11`: [BLE -> APP] Key Press Event
+- `13`: [APP -> BLE] Event Command (e.g., Re-center)
+- `14`: [BLE -> APP] Real-time Data Packet (Current format)
+
+# --- Communication Flow ---
+
+## 1. Connection & Handshake
+
+Upon establishing a Bluetooth connection, a three-step handshake is required before real-time data is sent.
+
+**Step 1: UUID**
+- BLE sends UUID.
+  - `{"type": 1, "uuid": "..."}`
+- APP responds with ACK.
+  - `{"type": 2, "ack": 1}`
+
+**Step 2: MAC Address**
+- BLE sends MAC Address.
+  - `{"type": 4, "mac": "..."}`
+- APP responds with ACK.
+  - `{"type": 2, "ack": 2}`
+
+**Step 3: Firmware Version**
+- BLE sends Firmware Version.
+  - `{"type": 5, "version": "...", "maxV": 18}`
+- APP responds with ACK.
+  - `{"type": 2, "ack": 3}`
+
+After the third ACK is sent, the handshake is complete. The APP will display a "Connected" status.
+
+## 2. Data Transmission (BLE -> APP)
+
+Once the handshake is complete, the device sends real-time data.
+
+**Real-time Data (`type: 7` or `type: 14`)**
+- The device sends a continuous stream of data packets. The extension handles both type 7 and type 14.
+- **Payload Example (`type: 14`):**
+  ```json
+  {
+      "type": 14,
+      "value": {
+          "v": [0],       // Thrust intensity (0-18)
+          "p": 5,         // Position ID (1-10)
+          "Yaw": 123.87,
+          "Pitch": 1.44,
+          "Roll": -1.89
+      }
+  }
+  ```
+- **Note:** The `v` value is an array, the code currently uses the first element `v[0]`.
+
+**Key Press Event (`type: 11`)**
+- Sent when the physical button on the device is pressed.
+- **Payload:**
+  - `{"type": 11, "k": 1}`
+
+## 3. Commands (APP -> BLE)
+
+The application can send commands to the device.
+
+**Re-center/Reset Yaw Command (`type: 13`)**
+- Sent when the user clicks the '🔁' button in the UI.
+- **Payload:**
+  - `{"type": 13, "mode": 2}`

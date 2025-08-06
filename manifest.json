@@ -1,0 +1,14 @@
+{
+    "display_name": "linkCUP",
+    "loading_order": 100,
+    "requires": [],
+    "optional": [],
+    "dependencies": [],
+    "js": "index.js",
+    "css": "style.css",
+    "author": "LnbConceptions",
+    "version": "0.1.0-alpha",
+    "homePage": "https://github.com/LnbConceptions/SillyTavern-linkCUP",
+    "auto_update": false,
+    "i18n": {}
+}
