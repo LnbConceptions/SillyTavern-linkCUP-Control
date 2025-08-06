@@ -93,7 +93,7 @@ class PaperPlane {
             if (this.wasStill) { // 状态从静止变为活动
                 // 检查是否满足“再次插入”条件
                 if (this.stillnessDuration > 10000) {
-                    console.log("EVENT: Re-insertion detected.");
+                    // console.log("EVENT: Re-insertion detected."); // Temporarily disabled for cleaner logs
                     if (this.onUpdate) this.onUpdate(this.values, 're-insertion');
                 }
                 // 重置状态
@@ -117,7 +117,7 @@ class PaperPlane {
             // 1. 之前有过超过10秒的连续活动
             // 2. 现在已经静止超过1秒
             if (this.wasContinuouslyActive && this.stillnessDuration > 1000) {
-                console.log("EVENT: Withdrawal confirmed after 1s of stillness.");
+                // console.log("EVENT: Withdrawal confirmed after 1s of stillness."); // Temporarily disabled for cleaner logs
                 if (this.onUpdate) this.onUpdate(this.values, 'withdrawal');
                 // 重置标志位，防止在同一次长暂停中重复触发
                 this.wasContinuouslyActive = false;
@@ -127,8 +127,6 @@ class PaperPlane {
 
     // 接收按键事件（高潮）
     updateKeyEvent() {
-        this.values.buttonRelease = true;
-        
         // 触发高潮事件，并附带上“有效交互时长”
         if (this.onUpdate) {
             this.onUpdate(this.values, 'keyEvent');
@@ -136,10 +134,6 @@ class PaperPlane {
 
         // 重置有效交互时长计时器
         this.values.effectiveInteractionTime = 0;
-
-        setTimeout(() => {
-            this.values.buttonRelease = false;
-        }, 1000);
     }
 
     // 周期性更新（每秒）
@@ -180,7 +174,7 @@ class PaperPlane {
     // 重置所有状态
     reset() {
         this.values = {
-            v: 0, Yaw: 0, Pitch: 0, Roll: 0, buttonRelease: false, p: 0,
+            v: 0, Yaw: 0, Pitch: 0, Roll: 0, p: 0,
             D: 0, F: 0, S: 0, sPrime: 0, thrustCount: 0, B: 1,
             intensityScore: 0,
             thrustCountPeriod: 0,

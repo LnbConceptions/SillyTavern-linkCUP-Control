@@ -23,11 +23,6 @@
     -   **类型**: `Number`
     -   **描述**: 设备的三轴姿态数据，用于判断方向和体位。
 
--   `buttonRelease`
-    -   **含义**: 按键事件标志 (Key Press Flag)
-    -   **类型**: `Boolean`
-    -   **描述**: 当设备上的物理按键被按下时，此标志位变为 `true`，持续约1秒，用于触发特殊事件（如射精）。
-
 ---
 
 ## 二、 派生数据 (Derived Data)
@@ -69,12 +64,7 @@
     -   **类型**: `Number`
     -   **描述**: 与 `sPrime` 类似，也是 `S` 的累加值。但它的用途是生成发送给AI的系统消息（例如描述动作是“轻柔的”还是“强烈的”）。它在每次系统消息**发送后**被重置。
 
--   `sessionStartTime`
-    -   **含义**: 会话开始时间 (Session Start Time)
-    -   **类型**: `Timestamp`
-    -   **描述**: 记录第一次检测到有效运动 (`v > 0`) 的时间戳。
-
--   `sessionDuration`
-    -   **含义**: 会话持续时长 (Session Duration)
+-   `effectiveInteractionTime`
+    -   **含义**: 有效交互时长 (Effective Interaction Time)
     -   **类型**: `Number` (毫秒)
-    -   **描述**: 从 `sessionStartTime` 开始计算的会话总时长。
+    -   **描述**: 累积所有有效运动（`v > 0`）的持续时间。当设备静止超过0.5秒后，计时会暂停，直到下一次运动开始。此值在高潮事件 (`keyEvent`) 发生后会被重置。

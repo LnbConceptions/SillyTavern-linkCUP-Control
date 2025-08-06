@@ -12,6 +12,8 @@ let linkCUPDevice = null;
 let writeCharacteristic = null;
 let notifyCharacteristic = null;
 let paperPlane = null;
+let lastKeyEventTime = null; // 用于按键事件防抖
+const CLIMAX_COOLDOWN_TIME = 5000; // 冷却时间5秒
 let handshakeState = {
     uuid_acked: false,
     mac_acked: false,
@@ -96,7 +98,7 @@ const sendToDevice = async (data) => {
     try {
         const encoder = new TextEncoder();
         await writeCharacteristic.writeValue(encoder.encode(JSON.stringify(data)));
-        console.log("Sent:", data);
+        // console.log("Sent:", data); // Temporarily disabled for cleaner logs
     } catch (error) {
         console.error("Error writing to device:", error);
         updateStatusMessage("Error: Failed to send data");
@@ -112,6 +114,9 @@ const handleNotifications = (event) => {
     try {
         const data = JSON.parse(jsonString);
         const { status } = getDOM();
+
+        // 详细记录所有蓝牙数据包，便于调试
+        // console.log(`[BLE-DATA] ${new Date().toISOString()} - ${jsonString}`); // Disabled for production
 
         switch (data.type) {
             case 1:
@@ -147,10 +152,19 @@ const handleNotifications = (event) => {
                     if (paperPlane) paperPlane.update(realtimeData);
                 }
                 break;
-            case 6: // Discovered through debugging: This is the actual key press event
-            case 11: // Keep this for protocol compliance / future firmware
+            case 6: // Power/status report - NOT a key event
+                // console.log(`Status report: Power=${data.power}, Battery=${data.adc_bat_data}`); // Temporarily disabled for cleaner logs
+                break;
+            case 11: // Actual key press event
                 if (handshakeState.firmware_acked && paperPlane) {
-                    paperPlane.updateKeyEvent();
+                    const now = Date.now();
+                    if (!lastKeyEventTime || now - lastKeyEventTime > CLIMAX_COOLDOWN_TIME) {
+                        lastKeyEventTime = now;
+                        console.log("EVENT: Key press detected. Triggering key event.");
+                        paperPlane.updateKeyEvent();
+                    } else {
+                        console.log(`EVENT: Key press ignored due to ${CLIMAX_COOLDOWN_TIME/1000}s cooldown.`);
+                    }
                 }
                 break;
         }
@@ -161,7 +175,7 @@ const handleNotifications = (event) => {
 
 // Function to handle the reset/re-center command
 const onResetClick = async () => {
-    console.log("Sending reset command to linkCUP...");
+    // console.log("Sending reset command to linkCUP..."); // Temporarily disabled for cleaner logs
     // Corrected payload based on the provided protocol document. TYPE_EVENT_ORIGIN is 13.
     await sendToDevice({ "type": 13, "mode": 2 });
     toastr.success('归位指令已发送！', 'linkCUP');
@@ -352,5 +366,5 @@ function unlockAudioContext() {
     const audio = new Audio(silentWav);
     audio.volume = 0;
     audio.play().catch(e => console.warn("Could not unlock audio context:", e));
-    console.log("Attempting to unlock audio context.");
+    // console.log("Attempting to unlock audio context."); // Temporarily disabled for cleaner logs
 }
