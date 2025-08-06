@@ -16,8 +16,9 @@ A summary of the message `type` values used in communication.
 - `2`: [APP -> BLE] Acknowledgement (ACK)
 - `4`: [BLE -> APP] MAC Address Information
 - `5`: [BLE -> APP] Firmware Version Information
+- `6`: [BLE -> APP] Power/Status Report (Used by current firmware as Key Press Event)
 - `7`: [BLE -> APP] Real-time Data Packet (Legacy format)
-- `11`: [BLE -> APP] Key Press Event
+- `11`: [BLE -> APP] Key Press Event (Documented, but not used by current firmware)
 - `13`: [APP -> BLE] Event Command (e.g., Re-center)
 - `14`: [BLE -> APP] Real-time Data Packet (Current format)
 
@@ -68,10 +69,14 @@ Once the handshake is complete, the device sends real-time data.
   ```
 - **Note:** The `v` value is an array, the code currently uses the first element `v[0]`.
 
-**Key Press Event (`type: 11`)**
+**Key Press Event (`type: 6` or `type: 11`)**
 - Sent when the physical button on the device is pressed.
-- **Payload:**
+- **Note on Implementation:** While the protocol documentation specifies `type: 11`, debugging has shown that the current firmware (`jooi01-A00.101`) actually sends a `type: 6` message upon key press.
+- **Payload (`type: 6` - Observed):**
+  - `{"type": 6, "power": 3, "adc_bat_data": 3531, "tick_adc": 7577}`
+- **Payload (`type: 11` - Documented):**
   - `{"type": 11, "k": 1}`
+- The extension code has been updated to handle **both** `type: 6` and `type: 11` as the key press event to ensure compatibility.
 
 ## 3. Commands (APP -> BLE)
 

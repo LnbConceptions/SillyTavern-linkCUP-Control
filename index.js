@@ -147,8 +147,9 @@ const handleNotifications = (event) => {
                     if (paperPlane) paperPlane.update(realtimeData);
                 }
                 break;
-            case 11:
-                if (handshakeState.firmware_acked && paperPlane && data.k === 1) {
+            case 6: // Discovered through debugging: This is the actual key press event
+            case 11: // Keep this for protocol compliance / future firmware
+                if (handshakeState.firmware_acked && paperPlane) {
                     paperPlane.updateKeyEvent();
                 }
                 break;
