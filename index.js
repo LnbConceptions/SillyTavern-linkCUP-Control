@@ -19,16 +19,25 @@ let handshakeState = {
 };
 
 // Helper function to show a temporary message in the status bar
-const updateStatusMessage = (message, duration = 3000) => {
+const updateStatusMessage = (message, duration = 3000, className = null) => {
     const { status } = getDOM();
     if (!status) return;
 
+    // Always reset to base class first, then set the message
+    status.className = 'linkcup-status';
     status.textContent = message;
 
+    // Add the special class if provided
+    if (className) {
+        status.classList.add(className);
+    }
+
+    // Set a timer to clear the message and reset the class
     setTimeout(() => {
-        // Clear the message after the duration, if it hasn't been replaced.
+        // Only clear if the message hasn't been replaced by another one
         if (status.textContent === message) {
             status.textContent = '';
+            status.className = 'linkcup-status';
         }
     }, duration);
 };
@@ -202,11 +211,16 @@ const onConnectClick = async () => {
         paperPlane = new PaperPlane((values, eventType = 'realtime') => {
             // The new, clean delegation model
             updateUI(values);
+
+            // The new event-driven message handler
+            handleMessages(values, paperPlane, eventType);
+
             if (eventType === 'keyEvent') {
-                handleKeyEvent(values);
+                // The original key event handler can be simplified or removed
+                // if all logic is moved to messageManager. For now, we keep it.
+                // handleKeyEvent(values); 
             } else {
                 handleAudio(values);
-                handleMessages(values, paperPlane);
                 updateBreathRate(values.B); // Update breath rate based on B value
             }
 
@@ -214,14 +228,11 @@ const onConnectClick = async () => {
             try {
                 const context = SillyTavern.getContext();
                 const characterName = context.name2;
+                const directValue = values.v;
 
-                // Check if the Live2D API and a model for the current character exist before calling
-                if (window.live2d && typeof window.live2d.setLinkCupValue === 'function' && window.live2d.models && window.live2d.models[characterName]) {
-                    // The v value is now correctly passed as 0-18 from paperplane.js.
-                    // We can send it directly to the Live2D extension without scaling.
-                    const directValue = values.v;
-
-                    // Call the clean API function with the correct character NAME.
+                // The check for the model's existence is now left to the Live2D extension itself,
+                // which is more robust against race conditions during initialization.
+                if (window.live2d && typeof window.live2d.setLinkCupValue === 'function') {
                     window.live2d.setLinkCupValue(characterName, directValue);
                 }
             } catch (error) {
