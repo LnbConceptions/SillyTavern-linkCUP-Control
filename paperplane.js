@@ -6,9 +6,10 @@ class PaperPlane {
         this.values = {
             v: 0, Yaw: 0, Pitch: 0, Roll: 0, buttonRelease: false, p: 0,
             D: 0, F: 0, S: 0, sPrime: 0, thrustCount: 0, B: 1,
-            intensityScore: 0, // 新增：用于计算5秒内的强度值
-            sessionStartTime: null, // 新增：会话开始时间
-            sessionDuration: 0, // 新增：会话持续时间 (ms)
+            intensityScore: 0, // 用于计算报告周期内的强度累积值
+            thrustCountPeriod: 0, // 用于计算报告周期内的抽插次数
+            sessionStartTime: null, // 会话开始时间
+            sessionDuration: 0, // 会话持续时间 (ms)
         };
 
         // 内部计算变量
@@ -60,6 +61,7 @@ class PaperPlane {
         }
         if (this.L !== 0 && this.L !== this.lastL) {
             this.values.thrustCount++;
+            this.values.thrustCountPeriod++; // Increment period-specific counter
             this.tempF++;
 
             const T2 = Date.now();
@@ -149,6 +151,11 @@ class PaperPlane {
     // 提供一个方法来重置强度分数，在消息成功发送后由外部调用
     resetIntensityScore() {
         this.values.intensityScore = 0;
+    }
+
+    // 提供一个方法来重置周期性抽插次数
+    resetThrustCountPeriod() {
+        this.values.thrustCountPeriod = 0;
     }
 
     // Clean up when the object is no longer needed
