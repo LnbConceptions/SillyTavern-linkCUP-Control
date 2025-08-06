@@ -212,13 +212,11 @@ const onConnectClick = async () => {
 
             // Live2D Integration - The new, correct way
             try {
-                // Check if the Live2D extension's API is available
-                if (window.live2d && typeof window.live2d.setLinkCupValue === 'function') {
-                    const context = SillyTavern.getContext();
-                    // FINAL, DECISIVE FIX: The Live2D extension keys its models by character NAME, not ID.
-                    // For a single character chat, the name is stored in `context.name2`.
-                    const characterName = context.name2;
+                const context = SillyTavern.getContext();
+                const characterName = context.name2;
 
+                // Check if the Live2D API and a model for the current character exist before calling
+                if (window.live2d && typeof window.live2d.setLinkCupValue === 'function' && window.live2d.models && window.live2d.models[characterName]) {
                     // The v value is now correctly passed as 0-18 from paperplane.js.
                     // We can send it directly to the Live2D extension without scaling.
                     const directValue = values.v;
