@@ -1,0 +1,14 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Zip archives
+*.zip
+
+# Node modules
+node_modules/
+
+# Build output
+dist/
+build/
