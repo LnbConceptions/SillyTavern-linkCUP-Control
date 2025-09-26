@@ -54,12 +54,17 @@
             9: '十字位 (Cross)',
             10: '悬挂位 (Suspended)',
         };
-        const excitementMap = {
-            1: '平静 (Calm)',
-            2: '微兴 (Aroused)',
-            3: '兴奋 (Excited)',
-            4: '高涨 (Heightened)',
-            5: '极乐 (Ecstatic)',
+        // 生成粉色爱心图标显示兴奋度
+        const generateExcitementHearts = (level) => {
+            const hearts = [];
+            for (let i = 1; i <= 5; i++) {
+                if (i <= level) {
+                    hearts.push('<span style="color: #ff69b4; font-size: 16px;">♥</span>'); // 实心粉色爱心
+                } else {
+                    hearts.push('<span style="color: #ff69b4; font-size: 16px;">♡</span>'); // 空心粉色爱心
+                }
+            }
+            return hearts.join(' ');
         };
 
         container.append(`<li><strong>当前体位:</strong> ${values.p} (${positionMap[values.p] || '未知'})</li>`);
@@ -68,7 +73,7 @@
         container.append(`<li><strong>抽插速度:</strong> ${values.S}</li>`);
         container.append(`<li><strong>累计兴奋值:</strong> ${values.sPrime}</li>`);
         container.append(`<li><strong>总计次数:</strong> ${values.thrustCount}</li>`);
-        container.append(`<li><strong>角色兴奋度:</strong> ${values.B} (${excitementMap[values.B] || '未知'})</li>`);
+        container.append(`<li><strong>角色兴奋度:</strong> ${generateExcitementHearts(values.B)}</li>`);
         container.append(`<li><strong>Yaw/Pitch/Roll:</strong> ${values.Yaw.toFixed(2)} / ${values.Pitch.toFixed(2)} / ${values.Roll.toFixed(2)}</li>`);
     }
 

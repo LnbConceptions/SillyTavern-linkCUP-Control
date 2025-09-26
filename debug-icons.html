@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图标调试测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #2a2a2a;
+            color: white;
+        }
+        
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #666;
+            border-radius: 8px;
+        }
+        
+        .position-btn {
+            width: 60px;
+            height: 60px;
+            margin: 5px;
+            border: 2px solid #666;
+            border-radius: 8px;
+            background-color: #f5f5f5;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+        }
+        
+        .position-icon {
+            width: 100%;
+            height: 100%;
+            max-width: 40px;
+            max-height: 40px;
+            object-fit: contain;
+        }
+        
+        .direct-img {
+            width: 40px;
+            height: 40px;
+            margin: 5px;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <h1>图标显示调试测试</h1>
+    
+    <div class="test-section">
+        <h2>测试1: 直接显示图片</h2>
+        <img src="position-icons/P1.png" alt="P1" class="direct-img">
+        <img src="position-icons/P2.png" alt="P2" class="direct-img">
+        <img src="position-icons/P3.png" alt="P3" class="direct-img">
+        <img src="position-icons/P4.png" alt="P4" class="direct-img">
+        <img src="position-icons/P5.png" alt="P5" class="direct-img">
+    </div>
+    
+    <div class="test-section">
+        <h2>测试2: 按钮中的图片</h2>
+        <button class="position-btn">
+            <img src="position-icons/P1.png" alt="Position 1" class="position-icon">
+        </button>
+        <button class="position-btn">
+            <img src="position-icons/P2.png" alt="Position 2" class="position-icon">
+        </button>
+        <button class="position-btn">
+            <img src="position-icons/P3.png" alt="Position 3" class="position-icon">
+        </button>
+        <button class="position-btn">
+            <img src="position-icons/P4.png" alt="Position 4" class="position-icon">
+        </button>
+        <button class="position-btn">
+            <img src="position-icons/P5.png" alt="Position 5" class="position-icon">
+        </button>
+    </div>
+    
+    <div class="test-section">
+        <h2>测试3: 使用绝对路径</h2>
+        <button class="position-btn">
+            <img src="http://localhost:8000/position-icons/P1.png" alt="Position 1" class="position-icon">
+        </button>
+        <button class="position-btn">
+            <img src="http://localhost:8000/position-icons/P2.png" alt="Position 2" class="position-icon">
+        </button>
+        <button class="position-btn">
+            <img src="http://localhost:8000/position-icons/P3.png" alt="Position 3" class="position-icon">
+        </button>
+    </div>
+    
+    <div class="test-section">
+        <h2>测试4: 检查图片加载状态</h2>
+        <div id="image-status"></div>
+    </div>
+    
+    <script>
+        // 检查图片加载状态
+        const images = document.querySelectorAll('img');
+        const statusDiv = document.getElementById('image-status');
+        
+        images.forEach((img, index) => {
+            img.onload = function() {
+                statusDiv.innerHTML += `<p>图片 ${index + 1} (${img.src}) 加载成功</p>`;
+            };
+            
+            img.onerror = function() {
+                statusDiv.innerHTML += `<p style="color: red;">图片 ${index + 1} (${img.src}) 加载失败</p>`;
+            };
+        });
+    </script>
+</body>
+</html>

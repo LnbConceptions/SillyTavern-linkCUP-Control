@@ -61,7 +61,10 @@
     position: fixed;
     top: 100px;
     right: 20px;
-    width: 300px;
+    width: 350px;
+    min-width: 350px; /* Minimum width when resizing - 确保能容纳5个体位按键 */
+    max-width: 500px; /* Maximum width when resizing */
+    min-height: 150px; /* Minimum height when resizing */
     background-color: rgba(40, 40, 40, 0.6); /* Semi-transparent background */
     backdrop-filter: blur(5px); /* Optional: adds a blur effect to the background */
     -webkit-backdrop-filter: blur(5px); /* For Safari */
@@ -71,6 +74,13 @@
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     display: flex;
     flex-direction: column;
+    transition: height 0.3s ease; /* Smooth height transitions */
+    overflow: hidden; /* Prevent content overflow during transitions */
+    resize: both; /* Enable native resize */
+}
+
+.linkcup-floating-window.collapsed {
+    width: 210px; /* 60% of 350px */
 }
 
 .linkcup-drag-handle {
@@ -85,6 +95,7 @@
     justify-content: space-between;
     align-items: center;
     font-weight: bold;
+    flex-shrink: 0; /* Prevent shrinking */
 }
 
 .linkcup-close-btn {
@@ -100,17 +111,56 @@
     color: var(--text-color-primary);
 }
 
+/* Collapse/Expand button */
+.linkcup-collapse-btn {
+    cursor: pointer;
+    background: none;
+    border: none;
+    color: var(--text-color-secondary);
+    font-size: 14px;
+    margin-right: 8px;
+    padding: 2px 4px;
+    border-radius: 3px;
+    transition: background-color 0.2s;
+}
+
+.linkcup-collapse-btn:hover {
+    color: var(--text-color-primary);
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
 #linkcup-content-wrapper {
     padding: 10px;
     display: flex;
     flex-direction: column;
     gap: 5px; /* Reduced gap between elements */
+    transition: opacity 0.3s ease, height 0.3s ease;
+    overflow: hidden;
 }
 
+.linkcup-floating-window.collapsed #linkcup-content-wrapper {
+    padding: 5px 10px; /* Reduced padding when collapsed */
+}
+
+/* Chart container - always visible */
 #linkcup-chart-container {
-    flex-shrink: 0; /* Prevent chart from shrinking */
+    flex: 0 0 auto; /* Do not grow by default */
     border: 1px solid var(--border-color);
     border-radius: 5px;
+    height: 140px; /* Default height, can be adjusted via JS when resizing */
+}
+
+/* Collapsible content wrapper */
+.linkcup-collapsible-content {
+    transition: max-height 0.3s ease, opacity 0.3s ease;
+    overflow: hidden;
+}
+
+.linkcup-floating-window.collapsed .linkcup-collapsible-content {
+    max-height: 0 !important;
+    opacity: 0;
+    padding: 0;
+    margin: 0;
 }
 
 .linkcup-data {
@@ -120,6 +170,53 @@
 
 .linkcup-status {
     margin-top: auto; /* Push status to the bottom */
+}
+
+/* Control Panel Container */
+.linkcup-control-panel {
+    margin: 8px 0;
+    padding: 8px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Audio Control Buttons */
+.linkcup-audio-controls {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+}
+
+.linkcup-audio-toggle {
+    flex: 1;
+    min-width: 100px;
+    padding: 6px 8px;
+    font-size: 0.8em;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: var(--background-color-2);
+    color: var(--text-color-primary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.linkcup-audio-toggle:hover {
+    background-color: var(--background-color-3);
+}
+
+.linkcup-audio-toggle.enabled {
+    background-color: #4CAF50;
+    color: white;
+    border-color: #45a049;
+}
+
+.linkcup-audio-toggle.disabled {
+    background-color: #f44336;
+    color: white;
+    border-color: #da190b;
 }
 
 /* Style for the button in the extension settings drawer */
@@ -149,4 +246,242 @@
     padding: 0;
     font-size: 1.2em;
     display: none; /* Hidden by default */
+}
+
+/* Responsive adjustments for smaller collapsed windows */
+@media (max-width: 320px) {
+    .linkcup-floating-window {
+        width: 280px;
+    }
+    
+    .linkcup-audio-controls {
+        flex-direction: column;
+    }
+    
+    .linkcup-audio-toggle {
+        min-width: auto;
+    }
+}
+
+/* Position Controls */
+.linkcup-position-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.linkcup-auto-toggle {
+    padding: 6px 8px;
+    font-size: 0.8em;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: var(--background-color-2);
+    color: var(--text-color-primary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.linkcup-auto-toggle.enabled {
+    background-color: #4CAF50;
+    color: white;
+    border-color: #45a049;
+}
+
+.linkcup-auto-toggle.disabled {
+    background-color: #f44336;
+    color: white;
+    border-color: #da190b;
+}
+
+.linkcup-position-selector {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.linkcup-position-row {
+    display: flex;
+    gap: 6px;
+    justify-content: space-between;
+}
+
+.linkcup-position-btn {
+    flex: 1;
+    min-width: 60px;
+    min-height: 60px;
+    padding: 6px;
+    border: 2px solid #666;
+    border-radius: 8px;
+    background-color: #999; /* 中灰色背景，非激活状态 */
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    user-select: none; /* 禁用文本选择 */
+    -webkit-user-drag: none; /* 禁用拖拽 */
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.linkcup-position-btn:hover {
+    background-color: #777; /* 悬停时稍微变深 */
+    border-color: #888;
+    transform: scale(1.05); /* 轻微放大效果 */
+}
+
+.linkcup-position-btn.active {
+    background-color: #ccc; /* 浅灰色背景表示激活状态 */
+    border-color: #aaa;
+    box-shadow: 0 0 8px rgba(170, 170, 170, 0.5);
+}
+
+.position-icon {
+    width: 100%;
+    height: 100%;
+    max-width: 50px; /* 增大图标尺寸 */
+    max-height: 50px; /* 增大图标尺寸 */
+    object-fit: contain;
+    filter: contrast(1.2); /* 增强黑色线条的对比度 */
+    pointer-events: none; /* 禁用图标的鼠标事件，防止拖拽 */
+    user-select: none; /* 禁用选择 */
+    -webkit-user-drag: none; /* 禁用拖拽 */
+    -moz-user-select: none;
+    -ms-user-select: none;
+    draggable: false; /* 明确禁用拖拽 */
+}
+
+/* 当窗口折叠时，隐藏可折叠内容（中间所有内容） */
+.linkcup-floating-window.collapsed #linkcup-collapsible-content,
+.linkcup-floating-window.collapsed .linkcup-collapsible-content {
+    max-height: 0 !important;
+    overflow: hidden;
+    opacity: 0;
+    margin: 0;
+    padding: 0;
+}
+
+/* 折叠态下按钮区：未连接时仅显示 Connect，已连接时显示 Disconnect（Reset 可选） */
+.linkcup-floating-window.collapsed .linkcup-button-container #linkcup-reset-btn { display: none; }
+.linkcup-floating-window.collapsed:not(.connected) .linkcup-button-container #linkcup-connect-btn { display: inline-flex; }
+.linkcup-floating-window.collapsed.connected .linkcup-button-container #linkcup-connect-btn.linkcup-connect-style { display: none; }
+.linkcup-floating-window.collapsed.connected .linkcup-button-container #linkcup-connect-btn.linkcup-disconnect-style { display: inline-flex; }
+
+/* Connect/Disconnect 定制颜色 */
+.menu_button.linkcup-connect-style {
+    background-color: #3ddc84; /* 绿色偏Android风 */
+    color: #000;
+}
+.menu_button.linkcup-connect-style:hover {
+    filter: brightness(0.95);
+}
+.menu_button.linkcup-disconnect-style {
+    background-color: #5a0000; /* 接近黑的深红 */
+    color: #fff;
+}
+.menu_button.linkcup-disconnect-style:hover {
+    filter: brightness(1.1);
+}
+
+/* ON/OFF 灰度样式（不显眼） */
+.linkcup-audio-toggle,
+.linkcup-auto-toggle {
+    background: #666;
+    color: #fff;
+    border: 1px solid #555;
+}
+.linkcup-audio-toggle.enabled,
+.linkcup-auto-toggle.enabled {
+    background: #bfbfbf; /* 浅灰 ON */
+    color: #111;
+    border-color: #aaa;
+}
+.linkcup-audio-toggle.disabled,
+.linkcup-auto-toggle.disabled {
+    background: #4a4a4a; /* 深灰 OFF */
+    color: #e0e0e0;
+    border-color: #3a3a3a;
+}
+
+/* 连接/断开按钮颜色 */
+.menu_button.linkcup-connect-style {
+    background: #1e5631; /* 暗绿色 */
+    color: #fff; /* 白色文字 */
+    border: 1px solid #0f3d1f;
+}
+.menu_button.linkcup-connect-style:hover {
+    background: #2e7d32; /* 悬停时变亮 */
+    border-color: #1b5e20;
+}
+.menu_button.linkcup-disconnect-style {
+    background: #5a0000; /* 暗红色 */
+    color: #fff; /* 白色文字 */
+    border: 1px solid #3d0000;
+}
+.menu_button.linkcup-disconnect-style:hover {
+    background: #8b0000; /* 悬停时变亮 */
+    border-color: #660000;
+}
+
+/* 折叠时图表容器保持适当尺寸以确保图表正常渲染 */
+.linkcup-floating-window.collapsed #linkcup-chart-container {
+    height: 80px;
+    min-width: 160px;
+}
+
+/* 性爱时长显示样式 */
+.linkcup-duration-container {
+    margin: 8px 0;
+    padding: 8px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.linkcup-duration-label {
+    font-size: 0.85em;
+    color: var(--text-color-secondary);
+    font-weight: bold;
+    flex-shrink: 0;
+}
+
+.linkcup-duration-display {
+    font-size: 0.9em;
+    color: var(--text-color-primary);
+    font-weight: bold;
+    font-family: 'Courier New', monospace;
+    background-color: rgba(0, 0, 0, 0.3);
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    min-width: 120px;
+    text-align: center;
+}
+
+/* 闪烁效果样式 */
+.linkcup-duration-display.blinking-red {
+    animation: blinkRedWhite 0.5s infinite;
+}
+
+@keyframes blinkRedWhite {
+    0% { 
+        background-color: #ff4444; 
+        color: white; 
+        border-color: #ff6666;
+    }
+    50% { 
+        background-color: white; 
+        color: #ff4444; 
+        border-color: #ff4444;
+    }
+    100% { 
+        background-color: #ff4444; 
+        color: white; 
+        border-color: #ff6666;
+    }
 }

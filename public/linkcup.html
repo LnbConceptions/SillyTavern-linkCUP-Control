@@ -1,7 +1,61 @@
-<div id="linkcup-chart-container" style="height: 100px; width: 100%;"></div>
-<ul id="linkcup-data-container" class="linkcup-data"></ul>
-<div id="linkcup-status" class="linkcup-status"></div>
+<!-- 实时动态曲线 - 始终在顶部 -->
+<div id="linkcup-chart-container" class="linkcup-chart-container" style="width: 100%;"></div>
+
+<!-- 可折叠的详细内容（展开状态才显示） -->
+<div id="linkcup-collapsible-content" class="linkcup-collapsible-content">
+    <div id="linkcup-status" class="linkcup-status">Disconnected</div>
+    
+    <div class="linkcup-control-panel">
+        <div class="linkcup-audio-controls">
+            <button id="linkcup-moan-toggle" class="linkcup-audio-toggle">呻吟：OFF</button>
+            <button id="linkcup-breath-toggle" class="linkcup-audio-toggle">呼吸：OFF</button>
+        </div>
+        <div class="linkcup-position-controls">
+            <button id="linkcup-auto-position-toggle" class="linkcup-auto-toggle enabled">自动体位：ON</button>
+            <div id="linkcup-manual-position-selector" class="linkcup-position-selector" style="display: none;">
+                <div class="linkcup-position-row">
+                    <button class="linkcup-position-btn active" data-position="1">
+                        <img src="scripts/extensions/third-party/linkCUP/public/position-icons/P1.png" alt="P1" class="position-icon" draggable="false">
+                    </button>
+                    <button class="linkcup-position-btn" data-position="2">
+                        <img src="scripts/extensions/third-party/linkCUP/public/position-icons/P2.png" alt="P2" class="position-icon" draggable="false">
+                    </button>
+                    <button class="linkcup-position-btn" data-position="3">
+                        <img src="scripts/extensions/third-party/linkCUP/public/position-icons/P3.png" alt="P3" class="position-icon" draggable="false">
+                    </button>
+                    <button class="linkcup-position-btn" data-position="4">
+                        <img src="scripts/extensions/third-party/linkCUP/public/position-icons/P4.png" alt="P4" class="position-icon" draggable="false">
+                    </button>
+                    <button class="linkcup-position-btn" data-position="5">
+                        <img src="scripts/extensions/third-party/linkCUP/public/position-icons/P5.png" alt="P5" class="position-icon" draggable="false">
+                    </button>
+                </div>
+                <div class="linkcup-position-row">
+                    <button class="linkcup-position-btn" data-position="6">
+                        <img src="scripts/extensions/third-party/linkCUP/public/position-icons/P6.png" alt="P6" class="position-icon" draggable="false">
+                    </button>
+                    <button class="linkcup-position-btn" data-position="7">
+                        <img src="scripts/extensions/third-party/linkCUP/public/position-icons/P7.png" alt="P7" class="position-icon" draggable="false">
+                    </button>
+                    <button class="linkcup-position-btn" data-position="8">
+                        <img src="scripts/extensions/third-party/linkCUP/public/position-icons/P8.png" alt="P8" class="position-icon" draggable="false">
+                    </button>
+                    <button class="linkcup-position-btn" data-position="9">
+                        <img src="scripts/extensions/third-party/linkCUP/public/position-icons/P9.png" alt="P9" class="position-icon" draggable="false">
+                    </button>
+                    <button class="linkcup-position-btn" data-position="10">
+                        <img src="scripts/extensions/third-party/linkCUP/public/position-icons/P10.png" alt="P10" class="position-icon" draggable="false">
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="linkcup-data-container" class="linkcup-data-container"></div>
+</div>
+
+<!-- 连接/断开按钮 - 始终在底部 -->
 <div class="linkcup-button-container">
-    <button id="linkcup-connect-btn" class="menu_button">Connect linkCUP</button>
-    <button id="linkcup-reset-btn" class="menu_button">🔁</button>
+    <button id="linkcup-connect-btn" class="menu_button linkcup-connect-style">Connect linkCUP</button>
+    <button id="linkcup-reset-btn" class="menu_button linkcup-disconnect-style" title="归位" style="display: none;">🔁</button>
 </div>
