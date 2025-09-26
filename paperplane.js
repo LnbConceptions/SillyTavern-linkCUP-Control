@@ -43,15 +43,22 @@ class PaperPlane {
 
             this.tempF++;
 
+            // Bang音效触发逻辑：当D从-1变为1时触发（忽略D=0的情况）
+            if (this.lastL === -1 && this.L === 1) {
+                if (this.onUpdate) {
+                    this.onUpdate(this.values, 'bang');
+                }
+            }
+
             const T2 = now;
             const v2 = this.values.v;
             if (this.lastDirectionChangeTime > 0) {
                 const timeDiff = T2 - this.lastDirectionChangeTime;
                 if (timeDiff > 0) {
-                    const speed = Math.abs(Math.ceil((v2 - this.lastDirectionChangeV) / timeDiff * 1000));
+                    const speed = Math.ceil((v2 - this.lastDirectionChangeV) / timeDiff * 1000);
                     this.values.S = speed;
-                    this.values.sPrime += speed;
-                    this.values.intensityScore += speed;
+                    this.values.sPrime += Math.abs(speed);
+                    this.values.intensityScore += Math.abs(speed);
                 }
             }
             this.lastDirectionChangeTime = T2;

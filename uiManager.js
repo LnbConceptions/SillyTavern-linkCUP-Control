@@ -57,7 +57,7 @@ export const initUI = () => {
         const script = document.createElement('script');
         script.src = eChartsUrl;
         script.onload = () => {
-            console.log('ECharts loaded successfully for UI Manager.');
+            // console.log('ECharts loaded successfully for UI Manager.');
             initChart();
         };
         script.onerror = (err) => console.error('Failed to load ECharts:', err);
@@ -102,6 +102,7 @@ export const updateUI = (values) => {
     dataContainer.innerHTML = `
         <li><strong>当前体位:</strong> ${positionMap[values.p] || '未知'}</li>
         <li><strong>运动方向:</strong> ${values.D === 1 ? '进入' : values.D === -1 ? '退出' : '静止'}</li>
+        <li><strong>抽插速度:</strong> <span style="color: ${values.S > 0 ? '#00ff00' : values.S < 0 ? '#ff0000' : '#ffffff'}">${values.S}</span></li>
         <li><strong>抽插频率:</strong> ${values.F} 次/分钟</li>
         <li><strong>总计次数:</strong> ${Math.floor(values.thrustCount / 2)}</li>
         <li><strong>性爱时长:</strong> <span id="linkcup-duration-display">${getDurationDisplayText(values)}</span></li>
@@ -125,7 +126,7 @@ export const resetUI = () => {
         chartData = [];
         chartInstance.setOption({ series: [{ data: chartData }] });
     }
-    console.log("UIManager: UI reset.");
+    // console.log("UIManager: UI reset.");
 };
 
 export const resizeChart = () => {
@@ -165,12 +166,12 @@ const getDurationDisplayText = (values) => {
     const globalState = window.globalSexTimerState || {};
     const { sexTimerStarted, sexTimerEnded, effectiveInteractionTime, isDurationPaused } = globalState;
     
-    console.log('Duration Display Debug:', {
-        sexTimerStarted,
-        sexTimerEnded,
-        effectiveTime: effectiveInteractionTime,
-        thrustCount: values.thrustCount
-    });
+    // console.log('Duration Display Debug:', {
+    //     sexTimerStarted,
+    //     sexTimerEnded,
+    //     effectiveTime: effectiveInteractionTime,
+    //     thrustCount: values.thrustCount
+    // });
 
     if (!sexTimerStarted) {
         return '尚未开始';
@@ -193,12 +194,12 @@ const updateDurationDisplay = (values) => {
     const globalState = window.globalSexTimerState || {};
     const { sexTimerStarted, sexTimerEnded, effectiveInteractionTime, isDurationPaused } = globalState;
     
-    console.log('Duration Display Debug:', {
-        sexTimerStarted,
-        sexTimerEnded,
-        effectiveTime: effectiveInteractionTime,
-        thrustCount: values.thrustCount
-    });
+    // console.log('Duration Display Debug:', {
+    //     sexTimerStarted,
+    //     sexTimerEnded,
+    //     effectiveTime: effectiveInteractionTime,
+    //     thrustCount: values.thrustCount
+    // });
 
     if (!sexTimerStarted) {
         durationElement.textContent = '尚未开始';

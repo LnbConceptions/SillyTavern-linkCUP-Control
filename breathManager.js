@@ -38,7 +38,7 @@ const animateBreath = (timestamp) => {
 
 export const startBreathing = () => {
     if (isRunning) return;
-    console.log("linkCUP: Starting breathing animation.");
+    // console.log("linkCUP: Starting breathing animation.");
     isRunning = true;
     startTime = 0; // Reset start time
     animationFrameId = requestAnimationFrame(animateBreath);
@@ -46,7 +46,7 @@ export const startBreathing = () => {
 
 export const stopBreathing = () => {
     if (!isRunning) return;
-    console.log("linkCUP: Stopping breathing animation.");
+    // console.log("linkCUP: Stopping breathing animation.");
     isRunning = false;
     if (animationFrameId) {
         cancelAnimationFrame(animationFrameId);
@@ -57,7 +57,7 @@ export const stopBreathing = () => {
 export const updateBreathRate = (b_value) => {
     const rate = breathRateMap[b_value];
     if (rate && rate !== currentRate) {
-        console.log(`linkCUP: Updating breath rate for b=${b_value} to ${rate}ms.`);
+        // console.log(`linkCUP: Updating breath rate for b=${b_value} to ${rate}ms.`);
         currentRate = rate;
         startTime = 0; // Reset start time to avoid jump in animation
     }

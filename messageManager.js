@@ -72,12 +72,12 @@ const hasCharacterSelected = () => {
  */
 const sendMessageToAI = (messageContent) => {
     if (!hasCharacterSelected()) {
-        console.log("MessageManager: No character selected, skipping message:", messageContent);
+        // console.log("MessageManager: No character selected, skipping message:", messageContent);
         return;
     }
     
     const context = SillyTavern.getContext();
-    console.log("MessageManager: Sending to AI ->", messageContent);
+    console.log("System Message ->", messageContent);
 
     const message = {
         mes: messageContent,
@@ -113,13 +113,17 @@ const sendPeriodicActionReport = (paperPlane) => {
         return;
     }
     
+    // 检查体位变化
+    const positionChange = (lastPosition !== null && lastPosition !== values.p) ? 
+        { previousPosition: lastPosition, currentPosition: values.p } : null;
+    
     // Use the text generator to create natural language message
     const naturalLanguageMessage = textGenerator.generatePeriodicAction({
         P: values.p,
         C: values.thrustCountPeriod,
         I: Math.round(values.intensityScore),
         B: values.B
-    });
+    }, positionChange);
     
     sendMessageToAI(naturalLanguageMessage);
     paperPlane.resetIntensityScore();
@@ -132,10 +136,14 @@ const sendPeriodicActionReport = (paperPlane) => {
  * @param {object} values - The latest data from paperPlane.
  */
 const sendReInsertionReport = (values) => {
+    // 检查体位变化
+    const positionChange = (lastPosition !== null && lastPosition !== values.p) ? 
+        { previousPosition: lastPosition, currentPosition: values.p } : null;
+    
     const naturalLanguageMessage = textGenerator.generateReInsertion({
         P: values.p,
         B: values.B
-    });
+    }, positionChange);
     sendMessageToAI(naturalLanguageMessage);
     if (window.linkcup) {
         window.linkcup.updateStatusMessage("及时事件：突然插入", EVENT_MESSAGE_DURATION, 'linkcup-status-event');
@@ -147,10 +155,14 @@ const sendReInsertionReport = (values) => {
  * @param {object} values - The latest data from paperPlane.
  */
 const sendWithdrawalReport = (values) => {
+    // 检查体位变化
+    const positionChange = (lastPosition !== null && lastPosition !== values.p) ? 
+        { previousPosition: lastPosition, currentPosition: values.p } : null;
+    
     const naturalLanguageMessage = textGenerator.generateWithdrawal({
         P: values.p,
         B: values.B
-    });
+    }, positionChange);
     sendMessageToAI(naturalLanguageMessage);
     if (window.linkcup) {
         window.linkcup.updateStatusMessage("及时事件：突然拔出", EVENT_MESSAGE_DURATION, 'linkcup-status-event');
@@ -165,12 +177,16 @@ const sendClimaxReport = (values) => {
     const ejaculationType = values.v > 0 ? 'inside' : 'outside';
     const durationInSeconds = Math.round(values.effectiveInteractionTime / 1000);
     
+    // 检查体位变化
+    const positionChange = (lastPosition !== null && lastPosition !== values.p) ? 
+        { previousPosition: lastPosition, currentPosition: values.p } : null;
+    
     const naturalLanguageMessage = textGenerator.generateClimax({
         P: values.p,
         B: values.B,
         E: ejaculationType,
         T: durationInSeconds
-    });
+    }, positionChange);
     
     sendMessageToAI(naturalLanguageMessage);
     if (window.linkcup) {
@@ -191,29 +207,12 @@ const sendClimaxReport = (values) => {
 export const handleMessages = (values, paperPlane, eventType) => {
     if (!paperPlane || isCoolingDown) return;
 
-    // 检查体位变化
-    if (lastPosition !== null && lastPosition !== values.p && hasCharacterSelected()) {
-        // 体位发生变化，发送体位变化报告
-        sendPositionChangeReport({
-            previousPosition: lastPosition,
-            currentPosition: values.p
-        });
-        // 设置冷却期，防止立即发送其他消息
-        isCoolingDown = true;
-        setTimeout(() => {
-            isCoolingDown = false;
-        }, COOLDOWN_PERIOD);
-    }
-    
-    // 更新上次体位记录
-    lastPosition = values.p;
-
     // Interrupt any pending periodic report if a special event occurs
     const isSpecialEvent = ['re-insertion', 'withdrawal', 'keyEvent'].includes(eventType);
     if (isSpecialEvent && autoSendTimer) {
         clearTimeout(autoSendTimer);
         isCountingDown = false;
-        console.log("MessageManager: Periodic report cancelled due to special event.");
+        // console.log("MessageManager: Periodic report cancelled due to special event.");
     }
 
     switch (eventType) {
@@ -244,6 +243,9 @@ export const handleMessages = (values, paperPlane, eventType) => {
             // Do nothing for other event types
             break;
     }
+
+    // 更新上次体位记录（在处理完事件后）
+    lastPosition = values.p;
 };
 
 /**
@@ -257,5 +259,5 @@ export const resetMessageState = () => {
     isCountingDown = false;
     isCoolingDown = false;
     lastPosition = null; // 重置体位记录
-    console.log("MessageManager: State reset.");
+    // console.log("MessageManager: State reset.");
 };

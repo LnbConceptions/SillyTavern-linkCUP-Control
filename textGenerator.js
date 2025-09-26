@@ -65,7 +65,7 @@ class TextGenerator {
      * 生成周期性动作描述 (Periodic Action)
      * System身份向{{char}}报告{{user}}的动作
      */
-    generatePeriodicAction(data) {
+    generatePeriodicAction(data, positionChange = null) {
         const { P, C, I, B } = data;
         
         const position = this.positionNames[P] || "current position";
@@ -90,8 +90,17 @@ class TextGenerator {
         const intensityWord = this.getRandomFromArray(this.intensityDescriptions[intensityLevel]);
         const rhythmPhrase = this.getRandomFromArray(this.rhythmDescriptions[rhythmLevel]);
 
-        // 构建System身份的自然语言描述，明确表达正在进行的动作
-        let description = `{{user}} is actively penetrating and thrusting into {{char}} while positioned in ${position}. `;
+        // 构建System身份的自然语言描述
+        let description = "";
+        
+        // 如果有体位变化，先强调体位变化
+        if (positionChange) {
+            const previousPositionName = this.positionNames[positionChange.previousPosition] || `position ${positionChange.previousPosition}`;
+            const currentPositionName = this.positionNames[positionChange.currentPosition] || `position ${positionChange.currentPosition}`;
+            description += `{{user}} and {{char}}'s sexual position has changed from ${previousPositionName} to ${currentPositionName}. `;
+        }
+        
+        description += `{{user}} is actively penetrating and thrusting into {{char}} while positioned in ${position}. `;
         description += `Current session: ${C} deep thrusts with ${intensityWord} penetrating movements at a ${rhythmPhrase}. `;
         description += `{{char}} appears ${excitement} and is actively responding to each thrust and penetration.`;
 
@@ -102,7 +111,7 @@ class TextGenerator {
      * 生成重新插入事件描述 (Re-insertion Event)
      * System身份向{{char}}报告{{user}}重新插入的动作
      */
-    generateReInsertion(data) {
+    generateReInsertion(data, positionChange = null) {
         const { P, B, V } = data;
         
         const position = this.positionNames[P] || "current position";
@@ -119,8 +128,17 @@ class TextGenerator {
         
         const phrase = this.getRandomFromArray(reinsertionPhrases);
         
-        // 构建System身份的自然语言描述，明确表达重新插入后的状态
-        let description = `Following a brief withdrawal, {{user}} ${phrase} while positioned in ${position}. `;
+        // 构建System身份的自然语言描述
+        let description = "";
+        
+        // 如果有体位变化，先强调体位变化
+        if (positionChange) {
+            const previousPositionName = this.positionNames[positionChange.previousPosition] || `position ${positionChange.previousPosition}`;
+            const currentPositionName = this.positionNames[positionChange.currentPosition] || `position ${positionChange.currentPosition}`;
+            description += `{{user}} and {{char}}'s sexual position has changed from ${previousPositionName} to ${currentPositionName}. `;
+        }
+        
+        description += `Following a brief withdrawal, {{user}} ${phrase} while positioned in ${position}. `;
         description += `{{char}} appears ${excitement} as deep penetration resumes and intimate thrusting continues.`;
         
         return this.wrapSystemMessage(description);
@@ -130,7 +148,7 @@ class TextGenerator {
      * 生成拔出事件描述 (Withdrawal Event)
      * System身份向{{char}}报告{{user}}拔出的动作
      */
-    generateWithdrawal(data) {
+    generateWithdrawal(data, positionChange = null) {
         const { P, B } = data;
         
         const position = this.positionNames[P] || "the current position";
@@ -144,7 +162,18 @@ class TextGenerator {
         ];
 
         const phrase = this.getRandomFromArray(withdrawalPhrases);
-        const description = `${phrase} while previously positioned in ${position}. {{char}} remains ${excitement} despite the pause in penetration and thrusting activity.`;
+        
+        // 构建System身份的自然语言描述
+        let description = "";
+        
+        // 如果有体位变化，先强调体位变化
+        if (positionChange) {
+            const previousPositionName = this.positionNames[positionChange.previousPosition] || `position ${positionChange.previousPosition}`;
+            const currentPositionName = this.positionNames[positionChange.currentPosition] || `position ${positionChange.currentPosition}`;
+            description += `{{user}} and {{char}}'s sexual position has changed from ${previousPositionName} to ${currentPositionName}. `;
+        }
+        
+        description += `${phrase} while previously positioned in ${position}. {{char}} remains ${excitement} despite the pause in penetration and thrusting activity.`;
 
         return this.wrapSystemMessage(description);
     }
@@ -153,7 +182,7 @@ class TextGenerator {
      * 生成高潮事件描述 (Climax Event)
      * System身份向{{char}}报告{{user}}达到高潮的情况
      */
-    generateClimax(data) {
+    generateClimax(data, positionChange = null) {
         const { P, B, E, T } = data;
         
         const position = this.positionNames[P] || "current position";
@@ -180,7 +209,17 @@ class TextGenerator {
             ejaculationDescription = this.getRandomFromArray(outsidePhrases);
         }
 
-        let description = `${ejaculationDescription} while positioned in ${position}. `;
+        // 构建System身份的自然语言描述
+        let description = "";
+        
+        // 如果有体位变化，先强调体位变化
+        if (positionChange) {
+            const previousPositionName = this.positionNames[positionChange.previousPosition] || `position ${positionChange.previousPosition}`;
+            const currentPositionName = this.positionNames[positionChange.currentPosition] || `position ${positionChange.currentPosition}`;
+            description += `{{user}} and {{char}}'s sexual position has changed from ${previousPositionName} to ${currentPositionName}. `;
+        }
+        
+        description += `${ejaculationDescription} while positioned in ${position}. `;
         description += `本次性爱，用户性爱动作总共持续了${duration}。`;
         description += `{{char}} appears ${excitement} during this climactic moment of intimate connection.`;
 

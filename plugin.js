@@ -15,7 +15,7 @@ const info = {
  * @param router Express Router
  */
 async function init(router) {
-    console.log('linkCUP Interface plugin loaded!');
+    // console.log('linkCUP Interface plugin loaded!');
     
     // Serve static files from the 'public' directory
     router.use('/', express.static(path.join(__dirname, 'public')));
@@ -34,7 +34,7 @@ async function init(router) {
 }
 
 async function exit() {
-    console.log('linkCUP Interface plugin exited');
+    // console.log('linkCUP Interface plugin exited');
 }
 
 // Export the plugin

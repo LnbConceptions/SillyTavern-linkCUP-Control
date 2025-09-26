@@ -1,10 +1,45 @@
 // index.js - ✨ FINAL CORRECTED VERSION (using import.meta.url) ✨
 
 import { PaperPlane } from './paperplane.js';
-import { initializeAudio, handleAudio, resetAudioState, toggleMoan, toggleBreath, getMoanEnabled, getBreathEnabled } from './audioManager.js';
+import { initializeAudio, handleAudio, resetAudioState, toggleMoan, toggleBreath, getMoanEnabled, getBreathEnabled, playBang } from './audioManager.js';
 import { handleMessages, resetMessageState } from './messageManager.js';
 import { initUI, updateUI, resetUI, resizeChart } from './uiManager.js';
 import { startBreathing, stopBreathing, updateBreathRate, resetBreathState } from './breathManager.js';
+
+// 防止浏览器在开发者工具打开时暂停
+const preventBrowserPause = () => {
+    // 创建一个持续运行的定时器来保持页面活跃
+    setInterval(() => {
+        // 空操作，仅用于保持页面活跃
+    }, 1000);
+    
+    // 监听页面可见性变化，防止暂停
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            // 页面被隐藏时，创建一个微任务来保持活跃
+            Promise.resolve().then(() => {
+                // 空操作
+            });
+        }
+    });
+    
+    // 防止页面失去焦点时暂停
+    window.addEventListener('blur', () => {
+        // 创建一个微任务来保持活跃
+        Promise.resolve().then(() => {
+            // 空操作
+        });
+    });
+    
+    // 使用requestAnimationFrame保持渲染循环
+    const keepAlive = () => {
+        requestAnimationFrame(keepAlive);
+    };
+    keepAlive();
+};
+
+// 立即执行防暂停措施
+preventBrowserPause();
 
 // Global state variables
 let linkCUPDevice = null;
@@ -87,11 +122,11 @@ const handleKeyEvent = (values) => {
 
     const zhClimax = values.v > 0 ? '而且是内射！' : '他射在了外面！';
     const enClimax = values.v > 0 ? 'and came inside!' : 'and came outside!';
-    const zhMessage = `{{user}}：“射精了！” (${zhClimax})`;
+    const zhMessage = `{{user}}："射精了！" (${zhClimax})`;
     const enMessage = `{{user}}: "I'm cumming!" (${enClimax})`;
     
     const finalMessage = `${zhMessage}\n${enMessage}`;
-    console.log("linkCUP key event message:", finalMessage);
+    // console.log("linkCUP key event message:", finalMessage);
 
     const message = { mes: finalMessage, is_user: true, is_system: false, name: '{{user}}', send_date: Date.now(), is_api: false };
     context.chat.push(message);
@@ -156,10 +191,10 @@ const handleNotifications = (event) => {
                     const now = Date.now();
                     if (!lastKeyEventTime || now - lastKeyEventTime > CLIMAX_COOLDOWN_TIME) {
                         lastKeyEventTime = now;
-                        console.log("EVENT: Key press detected. Triggering key event.");
+                        // console.log("EVENT: Key press detected. Triggering key event.");
                         paperPlane.updateKeyEvent();
                     } else {
-                        console.log(`EVENT: Key press ignored due to ${CLIMAX_COOLDOWN_TIME/1000}s cooldown.`);
+                        // console.log(`EVENT: Key press ignored due to ${CLIMAX_COOLDOWN_TIME/1000}s cooldown.`);
                     }
                 }
                 break;
@@ -230,6 +265,10 @@ const onConnectClick = async () => {
                 if (eventType !== 'keyEvent') {
                     handleAudio(values);
                     updateBreathRate(values.B);
+                }
+                // 处理bang事件
+                if (eventType === 'bang') {
+                    playBang(values);
                 }
             }
             try {
@@ -310,9 +349,9 @@ jQuery(async () => {
 
         for (const path of possiblePaths) {
             try {
-                console.log(`[linkCUP] Attempting to load UI from: ${path}`);
+                // console.log(`[linkCUP] Attempting to load UI from: ${path}`);
                 settingsHtml = await $.get(path);
-                console.log(`[linkCUP] Successfully loaded UI from: ${path}`);
+                // console.log(`[linkCUP] Successfully loaded UI from: ${path}`);
                 break;
             } catch (err) {
                 console.warn(`[linkCUP] Failed to load from ${path}:`, err.message);
@@ -338,7 +377,7 @@ jQuery(async () => {
 
     const context = SillyTavern.getContext();
     context.eventSource.on(context.event_types.APP_READY, () => {
-        console.log("linkCUP: SillyTavern is ready. Initializing UI event listeners.");
+        // console.log("linkCUP: SillyTavern is ready. Initializing UI event listeners.");
         const dom = getDOM();
         if (dom.connectBtn) {
             dom.connectBtn.classList.add('linkcup-connect-style');

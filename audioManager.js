@@ -11,15 +11,19 @@ let audioLogicState = {
 };
 let lastPlayedMoan = [];
 let lastPlayedBreath = [];
+let lastPlayedBang = [];
 let moanFiles = [];
 let breathFiles = [];
+let bangFiles = [];
 let isAudioPlaying = false; // Mutex to prevent overlapping sounds
+let currentBangAudio = null; // Track current bang audio for stopping
 const extensionFolderPath = `scripts/extensions/third-party/linkCUP`;
 
 // Audio control state
 let audioControlState = {
     moanEnabled: true,
-    breathEnabled: true
+    breathEnabled: true,
+    bangEnabled: true
 };
 
 // --- Private Functions ---
@@ -99,6 +103,59 @@ const playBreathSound = (values) => {
     }
 };
 
+const playBangSound = (values) => {
+    if (!audioControlState.bangEnabled) return;
+
+    const { p, B: b } = values;
+    let matchingFiles = bangFiles.filter(file => {
+        const nameOnly = file.split('.')[0];
+        const parts = nameOnly.split('_');
+        
+        // 查找P部分，支持多个P值（如P2_P3_P5）
+        const pParts = parts.filter(part => part.startsWith('P'));
+        const pValues = pParts.map(part => parseInt(part.substring(1)));
+        const pMatches = pValues.includes(p) || pValues.includes(0);
+        
+        // 查找B部分
+        const bPart = parts.find(part => part.startsWith('B'));
+        if (!bPart) return false;
+        const fileB = parseInt(bPart.substring(1));
+        const bMatches = (fileB === b || fileB === 0);
+        
+        return pMatches && bMatches;
+    });
+
+    if (matchingFiles.length === 0) return;
+
+    // 立即停止当前播放的bang音效
+    if (currentBangAudio) {
+        currentBangAudio.pause();
+        currentBangAudio.currentTime = 0;
+        currentBangAudio = null;
+    }
+
+    // 选择文件播放
+    let availableFiles = matchingFiles.filter(f => !lastPlayedBang.includes(f));
+    if (availableFiles.length === 0) {
+        lastPlayedBang = lastPlayedBang.filter(f => !matchingFiles.includes(f));
+        availableFiles = matchingFiles;
+    }
+
+    const fileToPlay = availableFiles[Math.floor(Math.random() * availableFiles.length)];
+    if (fileToPlay) {
+        const audioPath = `${extensionFolderPath}/public/bang/${fileToPlay}`;
+        currentBangAudio = new Audio(audioPath);
+        currentBangAudio.play().catch(e => {
+            console.error("Bang audio playback failed:", e);
+            currentBangAudio = null;
+        });
+        currentBangAudio.onended = () => { 
+            currentBangAudio = null; 
+        };
+        lastPlayedBang.push(fileToPlay);
+    }
+};
+
 // --- Public API ---
 
 export const initializeAudio = () => {
@@ -132,6 +189,13 @@ export const initializeAudio = () => {
         "P0_B3_breath_1.wav", "P0_B3_breath_2.wav", "P0_B3_breath_3.wav", "P0_B3_breath_4.wav", "P0_B3_breath_5.wav", "P0_B3_breath_6.wav",
         "P0_B4_breath_1.wav", "P0_B4_breath_2.wav", "P0_B4_breath_3.wav", "P0_B4_breath_4.wav",
         "P0_B5_breath_1.wav", "P0_B5_breath_2.wav", "P0_B5_breath_3.wav", "P0_B5_breath_4.wav", "P0_B5_breath_5.wav"
+    ];
+    bangFiles = [
+        "P10_B0_bang_01.wav",
+        "P1_B0_bang_01.wav", "P1_B0_bang_02.wav",
+        "P2_P3_P5_B0_bang_01.wav", "P2_P3_P5_B0_bang_02.wav", "P2_P3_P5_B0_bang_03.wav", "P2_P3_P5_B0_bang_04.wav", "P2_P3_P5_B0_bang_05.wav",
+        "P4_P6_P7_P8_B0_bang_01.wav",
+        "P9_B0_bang_01.wav"
     ];
     console.log("AudioManager: Audio files populated.");
 };
@@ -191,9 +255,15 @@ export const resetAudioState = () => {
     if (audioLogicState.breathTimer) {
         clearTimeout(audioLogicState.breathTimer);
     }
+    // Stop current bang audio if playing
+    if (currentBangAudio) {
+        currentBangAudio.pause();
+        currentBangAudio.currentTime = 0;
+        currentBangAudio = null;
+    }
     audioLogicState = { lastNonZeroD: 0, stillnessStartTime: null, breathTimer: null, latestB: 1, latestP: 0 };
     isAudioPlaying = false;
-    console.log("AudioManager: State reset.");
+    // console.log("AudioManager: State reset.");
 };
 
 // Audio control functions
@@ -207,5 +277,14 @@ export const toggleBreath = () => {
     return audioControlState.breathEnabled;
 };
 
+export const toggleBang = () => {
+    audioControlState.bangEnabled = !audioControlState.bangEnabled;
+    return audioControlState.bangEnabled;
+};
+
 export const getMoanEnabled = () => audioControlState.moanEnabled;
 export const getBreathEnabled = () => audioControlState.breathEnabled;
+export const getBangEnabled = () => audioControlState.bangEnabled;
+
+// Export bang sound function for external use
+export const playBang = playBangSound;
